@@ -9,6 +9,8 @@
 #include <linux/videodev2.h>
 #include <fcntl.h>
 
+#define Perform(filename) perform(filename)
+
 char *camsnap_buffer(int *, struct v4l2_buffer *);
 
 int camsnap_init( struct v4l2_capability *capability, 
@@ -32,3 +34,4 @@ int camsnap_close( int *fd,
 		   struct v4l2_requestbuffers *rb,
 		   struct v4l2_buffer *buffer );
 
+char *perform(const char *filename);
