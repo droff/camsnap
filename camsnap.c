@@ -1,6 +1,5 @@
 #include "camsnap.h"
 
-// make buffer
 char *camsnap_buffer(int *fd, struct v4l2_buffer *buffer)
 {
 	char* membuffer = mmap( NULL, buffer->length, PROT_READ | PROT_WRITE, 
@@ -16,7 +15,6 @@ char *camsnap_buffer(int *fd, struct v4l2_buffer *buffer)
 	return membuffer;
 }
 
-// camsnap_init check capabilities and returns descriptor
 int camsnap_init( struct v4l2_capability *capability, 
 		  struct v4l2_format *format,
 		  struct v4l2_requestbuffers *rb,
@@ -39,6 +37,7 @@ int camsnap_init( struct v4l2_capability *capability,
 	}
 
 	// set format
+	// MJPGET
 	format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	format->fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
 	format->fmt.pix.width = width;
@@ -74,7 +73,6 @@ int camsnap_init( struct v4l2_capability *capability,
 	return fd;
 }
 
-// camsnap_start capturing
 int camsnap_start( int *fd, 
 		   struct v4l2_buffer *buffer,
 		   struct v4l2_requestbuffers *rb )
@@ -141,14 +139,16 @@ int camsnap_close( int *fd,
 	return 0;
 }
 
-char *camsnap_shot( int *buffer_size )
+char *camsnap_shot( unsigned short width,
+		    unsigned short height,
+		    int *buffer_size )
 {
 	struct v4l2_capability *cap 		= malloc(sizeof(struct v4l2_capability));
 	struct v4l2_format *format 		= malloc(sizeof(struct v4l2_format));
 	struct v4l2_requestbuffers *rb		= malloc(sizeof(struct v4l2_requestbuffers));
 	struct v4l2_buffer *buffer 		= malloc(sizeof(struct v4l2_buffer));
 
-	int fd = camsnap_init(cap, format, rb, buffer, 1280, 720);
+	int fd = camsnap_init(cap, format, rb, buffer, width, height);
 	char *membuffer = camsnap_buffer(&fd, buffer);
 
 	camsnap_start(&fd, buffer, rb);

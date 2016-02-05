@@ -22,7 +22,7 @@ int main( int argc, char **argv )
 		filename = argv[1];
 
 	int buffer_size = 0;
-	char *buffer = camsnap_shot(&buffer_size);
+	char *buffer = camsnap_shot(1280, 720, &buffer_size);
 	camsnap_save(filename, buffer, buffer_size);
 
 	printf("%d bytes saved\n", buffer_size);
