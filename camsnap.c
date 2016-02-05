@@ -96,7 +96,8 @@ int camsnap_start( int *fd,
 		return -1;
 	}
 
-	for (int i = 0; i < rb->count; i++) {
+	int i = 0;
+	for (i = 0; i < rb->count; i++) {
 		buffer->index = i;
 	}
 
@@ -110,7 +111,7 @@ int camsnap_start( int *fd,
 
 int camsnap_save( const char *filename,
 		  char *membuffer,
-		  struct v4l2_buffer *buffer )
+		  int length )
 {
 	int file = open(filename, O_WRONLY | O_CREAT, 0660);
 
@@ -119,7 +120,7 @@ int camsnap_save( const char *filename,
 		return 1;
 	}
 
-	write(file, membuffer, buffer->length);
+	write(file, membuffer, length);
 	close(file);
 
 	return 0;
@@ -140,7 +141,7 @@ int camsnap_close( int *fd,
 	return 0;
 }
 
-char *perform( const char *filename )
+char *camsnap_shot( int *buffer_size )
 {
 	struct v4l2_capability *cap 		= malloc(sizeof(struct v4l2_capability));
 	struct v4l2_format *format 		= malloc(sizeof(struct v4l2_format));
@@ -151,8 +152,9 @@ char *perform( const char *filename )
 	char *membuffer = camsnap_buffer(&fd, buffer);
 
 	camsnap_start(&fd, buffer, rb);
-	camsnap_save(filename, membuffer, buffer);
 	camsnap_close(&fd, cap, format, rb, buffer);
+	*buffer_size = buffer->length;
 
 	return membuffer;
 }
+

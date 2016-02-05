@@ -1,3 +1,6 @@
+#ifndef CAMSNAP_H
+#define CAMSNAP_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,9 +12,7 @@
 #include <linux/videodev2.h>
 #include <fcntl.h>
 
-#define Perform(filename) perform(filename)
-
-char *camsnap_buffer(int *, struct v4l2_buffer *);
+char *camsnap_buffer( int *, struct v4l2_buffer * );
 
 int camsnap_init( struct v4l2_capability *capability, 
 		  struct v4l2_format *format,
@@ -26,7 +27,7 @@ int camsnap_start( int *fd,
 
 int camsnap_save( const char *filename,
 		  char *membuffer,
-		  struct v4l2_buffer *buffer );
+		  int length );
 
 int camsnap_close( int *fd,
 		   struct v4l2_capability *cap, 
@@ -34,4 +35,5 @@ int camsnap_close( int *fd,
 		   struct v4l2_requestbuffers *rb,
 		   struct v4l2_buffer *buffer );
 
-char *perform(const char *filename);
+char *camsnap_shot( int *buffer_size );
+#endif

@@ -1,6 +1,6 @@
 #include "camsnap.h"
 
-int main(int argc, char *argv[])
+int main( int argc, char **argv )
 {
 /*	struct v4l2_capability *cap 		= malloc(sizeof(struct v4l2_capability));
 	struct v4l2_format *format 		= malloc(sizeof(struct v4l2_format));
@@ -14,13 +14,18 @@ int main(int argc, char *argv[])
 	camsnap_save(argv[1], membuffer, buffer);
 	camsnap_close(&fd, cap, format, rb, buffer);
 */
-	char *filename = argv[1];
+	char *filename = NULL;
 
-	if (filename == NULL)
-		*filename = "./shot.jpg";
+	if (argc != 2)
+		filename = "./shot.jpg\0";
+	else
+		filename = argv[1];
 
-	char *buffer = Perform(argv[1]);
-	printf("%i bytes saved\n", strlen(buffer));
+	int buffer_size = 0;
+	char *buffer = camsnap_shot(&buffer_size);
+	camsnap_save(filename, buffer, buffer_size);
+
+	printf("%d bytes saved\n", buffer_size);
 
 	return 0;
 }
