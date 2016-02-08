@@ -7,7 +7,7 @@ package camsnap
 import "C"
 import "unsafe"
 
-func Get(device string, width byte, height byte) []byte {
+func Get(device string, width uint16, height uint16) []byte {
 	deviceName := C.CString(device)
 	defer C.free(unsafe.Pointer(deviceName))
 
