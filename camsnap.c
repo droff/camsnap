@@ -112,6 +112,7 @@ int camsnap_save( const char *filename,
 		  char *membuffer,
 		  int length )
 {
+	size_t wbytes = 0;
 	int file = open(filename, O_WRONLY | O_CREAT, 0660);
 
 	if (file < 0) {
@@ -119,10 +120,10 @@ int camsnap_save( const char *filename,
 		return 1;
 	}
 
-	write(file, membuffer, length);
+	wbytes = write(file, membuffer, length);
 	close(file);
 
-	return 0;
+	return wbytes;
 }
 
 int camsnap_close( int *fd,
