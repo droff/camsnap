@@ -1,0 +1,5 @@
+*.o
+*.so
+*.jpg
+*.jpeg
+camsnap
