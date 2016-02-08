@@ -37,7 +37,7 @@ int camsnap_init( struct v4l2_capability *capability,
 	}
 
 	// set format
-	// MJPGET
+	// MJPEG
 	format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	format->fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
 	format->fmt.pix.width = width;
