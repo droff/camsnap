@@ -32,6 +32,7 @@ int camsnap_init( struct v4l2_capability *capability,
 		  struct v4l2_format *format,
 		  struct v4l2_requestbuffers *rb,
 		  struct v4l2_buffer *buffer,
+		  const char *device,
 		  unsigned short width,
 		  unsigned short height );
 
@@ -75,13 +76,15 @@ int camsnap_close( int *fd,
 /*
    * init device and buffers, take snapshot
    *
+   * device: e.g. /dev/video0
    * width: image width
    * height: image height
    * buffer_size: buffer size
    *
    * returns: raw data
  */
-char *camsnap_shot( unsigned short width,
+char *camsnap_shot( const char *device,
+		    unsigned short width,
 		    unsigned short height,
 		    int *buffer_size );
 

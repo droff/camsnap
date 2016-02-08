@@ -19,11 +19,12 @@ int camsnap_init( struct v4l2_capability *capability,
 		  struct v4l2_format *format,
 		  struct v4l2_requestbuffers *rb,
 		  struct v4l2_buffer *buffer,
+		  const char *device,
 		  unsigned short width,
 		  unsigned short height )
 {
 	// open device
-	int fd = open("/dev/video0", O_RDWR);
+	int fd = open(device, O_RDWR);
 
 	// check capabilities
 	if (ioctl(fd, VIDIOC_QUERYCAP, capability) < 0) {
@@ -139,7 +140,8 @@ int camsnap_close( int *fd,
 	return 0;
 }
 
-char *camsnap_shot( unsigned short width,
+char *camsnap_shot( const char *device,
+		    unsigned short width,
 		    unsigned short height,
 		    int *buffer_size )
 {
@@ -148,7 +150,7 @@ char *camsnap_shot( unsigned short width,
 	struct v4l2_requestbuffers *rb		= malloc(sizeof(struct v4l2_requestbuffers));
 	struct v4l2_buffer *buffer 		= malloc(sizeof(struct v4l2_buffer));
 
-	int fd = camsnap_init(cap, format, rb, buffer, width, height);
+	int fd = camsnap_init(cap, format, rb, buffer, device, width, height);
 	char *membuffer = camsnap_buffer(&fd, buffer);
 
 	camsnap_start(&fd, buffer, rb);
