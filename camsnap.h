@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -11,6 +12,7 @@
 #include <sys/mman.h>
 #include <linux/videodev2.h>
 #include <fcntl.h>
+
 
 /*
    * initialize v4l2_buffer
@@ -20,7 +22,8 @@
    *
    * returns: new buffer
  */
-char *camsnap_buffer( int *fd, struct v4l2_buffer *buffer );
+char *camsnap_buffer( int fd, struct v4l2_buffer *buffer );
+
 
 /*
    * initialize device settings
@@ -28,13 +31,13 @@ char *camsnap_buffer( int *fd, struct v4l2_buffer *buffer );
    *
    * returns: file descriptor
  */
-int camsnap_init( struct v4l2_capability *capability, 
-		  struct v4l2_format *format,
+int camsnap_init( struct v4l2_format *format,
 		  struct v4l2_requestbuffers *rb,
 		  struct v4l2_buffer *buffer,
 		  const char *device,
 		  unsigned short width,
 		  unsigned short height );
+
 
 /*
    * capturing from device into buffer
@@ -45,9 +48,10 @@ int camsnap_init( struct v4l2_capability *capability,
    *
    * returns: 0
  */
-int camsnap_start( int *fd, 
+int camsnap_start( int fd, 
 		   struct v4l2_buffer *buffer,
 		   struct v4l2_requestbuffers *rb );
+
 
 /*
    * save into file
@@ -62,21 +66,23 @@ int camsnap_save( const char *filename,
 		  char *membuffer,
 		  int length );
 
+
 /*
-   * free data
+   * free buffer
+   *
+   * buffer: pointer to a buffer
+   * size: size of buffer
    *
    * returns: 0
- */
-int camsnap_close( int *fd,
-		   struct v4l2_capability *cap, 
-		   struct v4l2_format *format, 
-		   struct v4l2_requestbuffers *rb,
-		   struct v4l2_buffer *buffer );
+*/
+int camsnap_free( void *buffer, 
+		  int size );
+
 
 /*
    * init device and buffers, take snapshot
    *
-   * device: e.g. /dev/video0
+   * device: e.g. "/dev/video0"
    * width: image width
    * height: image height
    * buffer_size: buffer size
