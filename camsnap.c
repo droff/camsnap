@@ -123,14 +123,6 @@ int camsnap_save( const char *filename,
 	return wbytes;
 }
 
-int camsnap_free( void *buffer,
-		  int size )
-{
-	munmap(buffer, size);
-	return 0;
-}
-
-
 char *camsnap_shot( const char *device,
 		    unsigned short width,
 		    unsigned short height,
@@ -139,19 +131,44 @@ char *camsnap_shot( const char *device,
 	struct v4l2_format *format 		= malloc(sizeof(struct v4l2_format));
 	struct v4l2_requestbuffers *rb		= malloc(sizeof(struct v4l2_requestbuffers));
 	struct v4l2_buffer *buffer 		= malloc(sizeof(struct v4l2_buffer));
+	char *jpeg 				= malloc(sizeof(char));
 
 	int fd = camsnap_init(format, rb, buffer, device, width, height);
 	char *membuffer = camsnap_buffer(fd, buffer);
 
 	camsnap_start(fd, buffer, rb);
-	*buffer_size = buffer->length;
+	*buffer_size = mjpeg2jpeg(membuffer, buffer->length, jpeg);
 	
 	close(fd);
 
+	munmap(membuffer, buffer->length);
 	free(format);
 	free(rb);
 	free(buffer);
 
-	return membuffer;
+	return jpeg;
 }
 
+int mjpeg2jpeg( const char *buffer, 
+		int buffer_size,
+		char *data )
+{
+	int i, j, size = 0;
+	int len = (buffer[4] << 8) | buffer[5];
+
+	for ( i = 0; i < buffer_size; i++ ) {
+		data[i+j] = buffer[i];
+		
+		if ( i == len + 3 )
+			for ( j = 0; j < (sizeof(fixed_dht) / sizeof(char)) ; j++ )
+				data[i+1+j] = fixed_dht[j];
+		
+		if ( (buffer[i] == 0xff) && (buffer[i+1] == 0xd9) ) {
+			data[i+j+1] = buffer[i+1];
+			size = i + j + 2;
+			break;
+		}
+	}
+
+	return size;
+}

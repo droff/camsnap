@@ -17,7 +17,6 @@ func Get(device string, width uint16, height uint16) []byte {
 	bufSize := C.int(0)
 
 	buffer = C.camsnap_shot(deviceName, C.ushort(width), C.ushort(height), &bufSize)
-	defer C.camsnap_free(unsafe.Pointer(buffer), bufSize)
 
 	rawBytes := C.GoBytes(unsafe.Pointer(buffer), bufSize)
 
