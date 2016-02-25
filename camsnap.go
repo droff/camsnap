@@ -1,7 +1,7 @@
 package camsnap
 
 /*
-#cgo LDFLAGS: -L. -lcamsnap
+#cgo LDFLAGS: -L/home/droff/gopath/src/github.com/droff/camsnap -lcamsnap
 #include "camsnap.h"
 */
 import "C"
@@ -11,14 +11,18 @@ func Get(device string, width uint16, height uint16) []byte {
 	deviceName := C.CString(device)
 	defer C.free(unsafe.Pointer(deviceName))
 
-	buffer := C.CString("")
-	defer C.free(unsafe.Pointer(buffer))
+	buffer := unsafe.Pointer(C.malloc(50000))
+	defer C.free(buffer)
 
-	bufSize := C.int(0)
+	bufSize := C.camsnap_shot(deviceName, C.ushort(width), C.ushort(height), (*C.byte)(buffer))
 
-	buffer = C.camsnap_shot(deviceName, C.ushort(width), C.ushort(height), &bufSize)
+	var arrayptr = uintptr(buffer)
+	var rawBytes = make([]byte, bufSize)
 
-	rawBytes := C.GoBytes(unsafe.Pointer(buffer), bufSize)
+	for i := 0; i < len(rawBytes); i++ {
+		rawBytes[i] = byte(*(*C.byte)(unsafe.Pointer(arrayptr)))
+		arrayptr++
+	}
 
 	return rawBytes
 }

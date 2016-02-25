@@ -13,7 +13,9 @@
 #include <linux/videodev2.h>
 #include <fcntl.h>
 
-static const unsigned char fixed_dht[] = {
+typedef unsigned char byte;
+
+static const byte fixed_dht[] = {
   0xff,0xc4,0x01,0xa2,0x00,0x00,0x01,0x05,0x01,0x01,0x01,0x01,
   0x01,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x02,
   0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x01,0x00,0x03,
@@ -51,44 +53,6 @@ static const unsigned char fixed_dht[] = {
   0xe8,0xe9,0xea,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa
 };
 
-/*
-   * initialize v4l2_buffer
-   *
-   * fd: file descriptor
-   * buffer: buffer information
-   *
-   * returns: new buffer
- */
-char *camsnap_buffer( int fd, struct v4l2_buffer *buffer );
-
-
-/*
-   * initialize device settings
-   * MJPG only!
-   *
-   * returns: file descriptor
- */
-int camsnap_init( struct v4l2_format *format,
-		  struct v4l2_requestbuffers *rb,
-		  struct v4l2_buffer *buffer,
-		  const char *device,
-		  unsigned short width,
-		  unsigned short height );
-
-
-/*
-   * capturing from device into buffer
-   *
-   * fd: file descriptor
-   * buffer: buffer
-   * rb: buffer information
-   *
-   * returns: 0
- */
-int camsnap_start( int fd, 
-		   struct v4l2_buffer *buffer,
-		   struct v4l2_requestbuffers *rb );
-
 
 /*
    * save into file
@@ -100,7 +64,7 @@ int camsnap_start( int fd,
    * returns: 0
  */
 int camsnap_save( const char *filename,
-		  char *membuffer,
+		  byte *membuffer,
 		  int length );
 
 
@@ -110,23 +74,14 @@ int camsnap_save( const char *filename,
    * device: e.g. "/dev/video0"
    * width: image width
    * height: image height
-   * buffer_size: buffer size
+   * buffer: bytes
    *
-   * returns: raw data
+   * returns: buffer size
  */
-char *camsnap_shot( const char *device,
-		    unsigned short width,
-		    unsigned short height,
-		    int *buffer_size );
+int camsnap_shot( const char *device,
+		  unsigned short width,
+		  unsigned short height,
+		  byte *buffer );
 
-
-/*
- * mjpeg to jpeg
- *
- * returns: size
-*/
-int mjpeg2jpeg( const char *buffer, 
-		int buffer_size,
-		char *data );
 
 #endif
