@@ -1,4 +1,4 @@
-#include "../camsnap.h"
+#include "camsnap.h"
 
 int main( int argc, char **argv )
 {
