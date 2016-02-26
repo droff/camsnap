@@ -1,18 +1,17 @@
 #include "camsnap.h"
 
 int camsnap_save( const char *filename,
-		  byte *membuffer,
+		  byte *buffer,
 		  int length )
 {
-	size_t wbytes = 0;
 	int file = open(filename, O_WRONLY | O_CREAT, 0660);
 
 	if (file < 0) {
 		perror("open");
-		return 1;
+		return -1;
 	}
 
-	wbytes = write(file, membuffer, length);
+	size_t wbytes = write(file, buffer, length);
 	close(file);
 
 	return wbytes;
@@ -23,15 +22,13 @@ int camsnap_shot( const char *device,
 		  unsigned short height,
 		  byte *jpeg )
 {	
-	int fd = 0;
-
 	struct v4l2_format format 	  = {};
 	struct v4l2_requestbuffers rb	  = {};
 	struct v4l2_buffer buffer 	  = {};
 	struct v4l2_capability capability = {};
 
 	// open device
-	fd = open(device, O_RDWR);
+	int fd = open(device, O_RDWR);
 
 	// check capabilities
 	if (ioctl(fd, VIDIOC_QUERYCAP, &capability) < 0) {
@@ -66,9 +63,6 @@ int camsnap_shot( const char *device,
 		perror("VIDIOC_REQBUFS");
 		return -1;
 	}
-
-	// allocate buffers
-	memset(&buffer, 0, sizeof(buffer));
 	 
 	buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	buffer.memory = V4L2_MEMORY_MMAP;
@@ -88,7 +82,6 @@ int camsnap_shot( const char *device,
 	}
 	 
 	memset(membuffer, 0, buffer.length);
-
 	int type = buffer.type;
 
 	if (ioctl(fd, VIDIOC_STREAMON, &type) < 0) {
@@ -111,9 +104,8 @@ int camsnap_shot( const char *device,
 		return -1;
 	}
 
-	int i = 0;
-	int j = 0;
-	int buffer_size = 0;
+	/* dht + buffer payload = jpeg  */
+	int i = 0, j = 0, jpeg_size = 0;
 	int len = (membuffer[4] << 8) | membuffer[5];
 
 	for ( i = 0; i < buffer.length; i++ ) {
@@ -125,16 +117,14 @@ int camsnap_shot( const char *device,
 		
 		if ( (membuffer[i] == 0xff) && (membuffer[i+1] == 0xd9) ) {
 			jpeg[i+j+1] = membuffer[i+1];
-			buffer_size = i + j + 2;
+			jpeg_size = i + j + 2;
 			break;
 		}
 	}
 	
 	close(fd);
-
 	munmap(membuffer, buffer.length);
-	printf("buffer_size: %d\n", buffer_size);
 
-	return buffer_size;
+	return jpeg_size;
 }
 

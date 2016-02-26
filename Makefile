@@ -1,6 +1,5 @@
 all:
-	gcc -c -Wall -Werror -fpic camsnap.c
-	gcc -shared -o libcamsnap.so camsnap.o
+	gcc -fPIC -Wall -shared -I include -O2 src/camsnap.c -o libcamsnap.so
 
 clean:
-	$(RM) libcamsnap.so camsnap.o
+	$(RM) libcamsnap.so

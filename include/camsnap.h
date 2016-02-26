@@ -64,7 +64,7 @@ static const byte fixed_dht[] = {
    * returns: 0
  */
 int camsnap_save( const char *filename,
-		  byte *membuffer,
+		  byte *buffer,
 		  int length );
 
 
