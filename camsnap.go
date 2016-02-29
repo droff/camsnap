@@ -2,7 +2,7 @@ package camsnap
 
 /*
 #cgo CFLAGS: -I include
-#cgo LDFLAGS: -L ./ -lcamsnap
+#cgo LDFLAGS: -L/home/droff/gopath/src/github.com/droff/camsnap -lcamsnap
 #include "camsnap.h"
 */
 import "C"
@@ -12,7 +12,8 @@ func Get(device string, width uint16, height uint16) []byte {
 	deviceName := C.CString(device)
 	defer C.free(unsafe.Pointer(deviceName))
 
-	buffer := unsafe.Pointer(C.malloc(55000))
+	// 55K ought to be enough for anybody :)
+	buffer := unsafe.Pointer(C.calloc(55000, unsafe.Sizeof(C.byte)))
 	defer C.free(buffer)
 
 	bufSize := C.camsnap_shot(deviceName, C.ushort(width), C.ushort(height), (*C.byte)(buffer))
